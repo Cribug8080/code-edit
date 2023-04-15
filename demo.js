@@ -1,12 +1,48 @@
+// ------Object.create
+
+function objectCreate(obj = null) {
+  function Fn() {}
+  Fn.prototype = obj;
+  return new Fn();
+}
+// const obj1 = {say: () => console.log('objectCreate---')};
+// const obj = objectCreate(obj1);
+// obj.say();
+
+// ------instanceof
+/**
+ * 实现 instanceof
+ * @param {object} left 需要检测的对象
+ * @param {prototype} right 构造函数
+ */
+function myInstanceof(left, right) {
+  let proto = Object.getPrototypeOf(left);
+  const prototype = right.prototype;
+
+  while (proto) {
+    if (proto === prototype) {
+      return true;
+    }
+    proto = Object.getPrototypeOf(proto);
+  }
+  return false;
+}
+// console.log('myInstanceof', myInstanceof([], Array));
+// function Person(name) {
+//   this.name = name;
+// }
+// console.log('myInstanceof', myInstanceof(new Person('2'), Person));
+// console.log('myInstanceof', myInstanceof([], Person));
+
 
 
 // ------实现new
 function objectFactor(fun, args) {
   if (typeof fun !== 'function') {
     throw new Error('type error');
-    return;
   }
 
+  // 新建一个空对象，对象的原型为构造函数的 prototype 对象
   const newObj = Object.create(fun.prototype);
   const returnVal = fun.apply(newObj, args);
 
@@ -18,11 +54,12 @@ function objectFactor(fun, args) {
 }
 
 // function Person(name) {this.name = name;};
-// Person.prototype.say = function(){console.log(this.name)};
 // let p1 = objectFactor(Person, ['wl']);
+// Person.prototype.say = function(){console.log(this.name)};
 // p1.say();
 
 // ------实现一个ajax
+// ------实现使用Promise封装AJAX请求
 function ajax(url, options = {}) {
   const {
     method = 'GET',
@@ -111,10 +148,83 @@ say.prototype.hello = function() {
 
 
 
-// ------
-// ------
-// ------
-// ------
+// ------截流与防抖
+function debounce(fn, delay = 50) {
+  let time;
+  return function() {
+    if (time) {
+      clearTimeout(time);
+      timer = null;
+    }
+    const context = this;
+    const args = [...arguments];
+    time = setTimeout(() => {
+      fn.apply(context, args);
+    }, delay);
+  }
+}
+function throttle(fn, delay = 50) {
+  let curTime = Date.now();
+  return function() {
+    let nowDate = Date.now();
+    let context = this;
+    let args = [...arguments];
+    if (nowDate - curTime > delay) {
+      curTime = Date.now();
+      fn.apply(context, args);
+    }
+  }
+}
+// const printFn = function(...args) {
+//   console.log('printFn', ...args);
+// }
+// const debounceFn1 = throttle(printFn, 1000);
+// const debounceFn1 = debounce(printFn, 1000);
+
+// let i = 0;
+// const interval = setInterval(() => {
+//   debounceFn1(++i);
+//   if (i === 10) {
+//     clearInterval(interval);
+//   }
+// }, 300);
+
+// ------ promise
+// ------ Promise.then
+// ------ Promise.all
+// ------ Promise.race
+// function MyPromise() {
+//   this.
+// }
+
+
+
+// ------ 柯里化 curry
+function curry(fn, ...argus) {
+  const len = fn.length;
+
+  return function(...argus2) {
+    const subArgus = [...argus, ...argus2];
+    if (subArgus.length < len) {
+      return curry.call(this, fn, ...subArgus);
+    } else {
+      return fn.apply(this, subArgus);
+    }
+  }
+}
+function curry2(fn, ...args) {
+  return fn.length > args.length ? curry2.bind(null, fn, ...args) : fn(...args);
+}
+// function sum(a, b, c) {
+//   console.log(a + b + c)
+// }
+// const c1 = curry2(sum);
+// cc = c1(1,2);
+// cc(5);
+// cc(6);
+
+// ------ 类型判断函数
+
 // ------
 // ------
 // ------
