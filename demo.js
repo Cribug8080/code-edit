@@ -225,8 +225,52 @@ function curry2(fn, ...args) {
 
 // ------ 类型判断函数
 
-// ------
-// ------
+// ------reduce
+
+Array.prototype.myReduce = function(fn, initialVal) {
+  if (typeof fn != 'function') {
+    throw new Error(`${fn} is not a function`);
+  }
+  let result = initialVal;
+  let startIdx = 0;
+  if (initialVal === undefined) {
+    if (this.length === 0) {
+      throw new Error('Reduce of empty array with no initial value');
+    }
+    result = this[0];
+    startIdx = 1;
+  }
+  const array = this;
+  for (let index = startIdx; index < array.length; index++) {
+    const element = array[index];
+    result = fn(result, element);
+  }
+  return result;
+}
+console.log([1].myReduce((p, v) => p + v, 9))
+
+
+// ------flat
+Array.prototype.myFlat = function(depth = 1) {
+  const stack = [...this];
+  const deepths = new Array(this.length).fill(1);
+  const result = [];
+
+  while (stack.length) {
+    const ele = stack.pop();
+    const deepth2 = deepths.pop();
+    if (Array.isArray(ele) && deepth2 < depth) {
+      stack.push(...ele);
+      deepths.push(...new Array(ele.length).fill(deepth2 + 1));
+    } else {
+      result.push(ele);
+    }
+  }
+  return result.reverse();
+}
+
+console.log([1,2,[3,4, [5, [6]]],7,8,9].myFlat())
+
 // ------
 // ------
 // ------
