@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    function jsonpRequest(callback) {
+      var script = document.createElement('script');
+      const callbackName = "fn" + new Date().getTime();
+      script.src = `/getName?callback=${callbackName}`
+      window[callbackName] = function(params) {
+        callback(params);
+      }
+      document.head.append(script);
+      script.onload = (e) => {
+        console.log('onload', e)
+      }
+    }
+
+    function fetchData() {
+      const callback = (data) => {
+        console.log('callback', data)
+      }
+      jsonpRequest(callback);
+    }
+  </script>
+  <button onclick="fetchData()">getData</button>
+</body>
+</html>
